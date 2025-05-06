@@ -9,8 +9,8 @@ public class Match {
     private final long startTime;
 
     public Match(String homeTeam, String awayTeam) {
-        this.homeTeam = homeTeam;
-        this.awayTeam = awayTeam;
+        this.homeTeam = homeTeam.strip();
+        this.awayTeam = awayTeam.strip();
         this.homeScore = 0;
         this.awayScore = 0;
         this.startTime = System.nanoTime();
