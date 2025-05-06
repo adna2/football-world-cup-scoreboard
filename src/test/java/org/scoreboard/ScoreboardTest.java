@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.scoreboard.Messages.*;
 
 public class ScoreboardTest {
 
@@ -31,7 +32,7 @@ public class ScoreboardTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 scoreboard.startMatch(" ", "Canada")
         );
-        assertEquals("Home team name is mandatory.", exception.getMessage());
+        assertEquals(HOME_TEAM_REQUIRED, exception.getMessage());
     }
 
     @Test
@@ -39,16 +40,16 @@ public class ScoreboardTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 scoreboard.startMatch("Mexico", "Mexico")
         );
-        assertEquals("Teams must be different.", exception.getMessage());
+        assertEquals(TEAMS_MUST_DIFFER, exception.getMessage());
     }
 
     @Test
     void shouldNotAllowDuplicateMatch() {
         scoreboard.startMatch("Mexico", "Canada");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                scoreboard.startMatch("Mexico", "Canada")
+                scoreboard.startMatch("Canada", "Mexico")
         );
-        assertEquals("Match is already in progress.", exception.getMessage());
+        assertEquals(MATCH_IN_PROGRESS, exception.getMessage());
     }
 
     @Test
@@ -56,6 +57,8 @@ public class ScoreboardTest {
         scoreboard.startMatch("Mexico", "Canada");
         scoreboard.updateScore("Mexico", "Canada", 0, 1);
         Match match = scoreboard.getSummary().get(0);
+        assertEquals(0, match.getHomeScore());
+        assertEquals(1, match.getAwayScore());
         assertEquals(1, match.getTotalScore());
     }
 
@@ -64,7 +67,7 @@ public class ScoreboardTest {
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
                 scoreboard.updateScore("X", "Y", 1, 0)
         );
-        assertEquals("Match not found.", exception.getMessage());
+        assertEquals(MATCH_NOT_FOUND, exception.getMessage());
     }
 
     @Test
@@ -73,7 +76,7 @@ public class ScoreboardTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 scoreboard.updateScore("Mexico", "Canada", -1, 0)
         );
-        assertEquals("Score cannot be negative.", exception.getMessage());
+        assertEquals(NEGATIVE_SCORE_NOT_ALLOWED, exception.getMessage());
     }
 
     @Test
@@ -88,7 +91,7 @@ public class ScoreboardTest {
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
                 scoreboard.finishMatch("X", "Y")
         );
-        assertEquals("Match not found.", exception.getMessage());
+        assertEquals(MATCH_NOT_FOUND, exception.getMessage());
     }
 
     @Test

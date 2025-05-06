@@ -5,20 +5,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.scoreboard.Messages.*;
+
 public class Scoreboard {
 
     private final List<Match> matches = new ArrayList<>();
 
     public void startMatch(String homeTeam, String awayTeam) {
-        validateTeams(homeTeam, awayTeam);
+        Match match = Match.create(homeTeam, awayTeam);
         checkIfMatchInProgress(homeTeam, awayTeam);
-        matches.add(new Match(homeTeam, awayTeam));
+        matches.add(match);
     }
 
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         Match match = findMatch(homeTeam, awayTeam);
         if (homeScore < 0 || awayScore < 0) {
-            throw new IllegalArgumentException("Score cannot be negative.");
+            throw new IllegalArgumentException(NEGATIVE_SCORE_NOT_ALLOWED);
         }
         match.updateScore(homeScore, awayScore);
     }
@@ -37,24 +39,12 @@ public class Scoreboard {
                 .toList();
     }
 
-    private void validateTeams(String homeTeam, String awayTeam) {
-        if (homeTeam == null || homeTeam.isBlank()) {
-            throw new IllegalArgumentException("Home team name is mandatory.");
-        }
-        if (awayTeam == null || awayTeam.isBlank()) {
-            throw new IllegalArgumentException("Away team name is mandatory.");
-        }
-        if (homeTeam.strip().equalsIgnoreCase(awayTeam.strip())) {
-            throw new IllegalArgumentException("Teams must be different.");
-        }
-    }
-
     private void checkIfMatchInProgress(String homeTeam, String awayTeam) {
         boolean matchExists = matches.stream()
-                .anyMatch(m -> m.getHomeTeam().equalsIgnoreCase(homeTeam)
-                        && m.getAwayTeam().equalsIgnoreCase(awayTeam));
+                .anyMatch(m -> (m.getHomeTeam().equalsIgnoreCase(homeTeam) && m.getAwayTeam().equalsIgnoreCase(awayTeam)) ||
+                        (m.getHomeTeam().equalsIgnoreCase(awayTeam) && m.getAwayTeam().equalsIgnoreCase(homeTeam)));
         if (matchExists) {
-            throw new IllegalArgumentException("Match is already in progress.");
+            throw new IllegalArgumentException(MATCH_IN_PROGRESS);
         }
     }
 
@@ -63,6 +53,6 @@ public class Scoreboard {
                 .filter(m -> m.getHomeTeam().equalsIgnoreCase(homeTeam)
                         && m.getAwayTeam().equalsIgnoreCase(awayTeam))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Match not found."));
+                .orElseThrow(() -> new NoSuchElementException(MATCH_NOT_FOUND));
     }
 }

@@ -1,5 +1,7 @@
 package org.scoreboard;
 
+import static org.scoreboard.Messages.*;
+
 public class Match {
 
     private final String homeTeam;
@@ -9,11 +11,32 @@ public class Match {
     private final long startTime;
 
     public Match(String homeTeam, String awayTeam) {
-        this.homeTeam = homeTeam.strip();
-        this.awayTeam = awayTeam.strip();
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
         this.homeScore = 0;
         this.awayScore = 0;
         this.startTime = System.nanoTime();
+    }
+
+    public static Match create(String homeTeam, String awayTeam) {
+        if (homeTeam == null || awayTeam == null) {
+            throw new IllegalArgumentException(TEAM_NAMES_REQUIRED);
+        }
+
+        String normalizedHome = homeTeam.strip();
+        String normalizedAway = awayTeam.strip();
+
+        if (normalizedHome.isEmpty()) {
+            throw new IllegalArgumentException(HOME_TEAM_REQUIRED);
+        }
+        if (normalizedAway.isEmpty()) {
+            throw new IllegalArgumentException(AWAY_TEAM_REQUIRED);
+        }
+        if (normalizedHome.equalsIgnoreCase(normalizedAway)) {
+            throw new IllegalArgumentException(TEAMS_MUST_DIFFER);
+        }
+
+        return new Match(normalizedHome, normalizedAway);
     }
 
     public String getHomeTeam() { return homeTeam; }
